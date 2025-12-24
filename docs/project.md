@@ -29,10 +29,13 @@ When using AI coding agents (Claude Code, Cursor, etc.), developers maintain con
 
 - **Onboard command**: Output instructions for an AI agent to discover and select relevant snippets
 - **Search command**: Query snippets by semantic similarity and return matches with ID, title, and content
-- **Select command**: Add a snippet to the current project's configuration
-- **Deselect command**: Remove a snippet from the current project's configuration
+- **Snippet command**: Fetch a single snippet by ID for detailed preview
+- **Select command**: Add one or more snippets to the current project's configuration
+- **Deselect command**: Remove one or more snippets from the current project's configuration
 - **List command**: Show all snippets currently selected for the project
 - **Generate command**: Output the combined markdown content for all selected snippets
+- **Doctor command**: Run diagnostics to verify database, embeddings, and project config are working
+- **JSON output**: All commands support `--json` flag for machine-readable output
 
 ### Data Flow
 
@@ -87,10 +90,12 @@ contextkit/
 │   │   │   ├── commands/
 │   │   │   │   ├── onboard.ts
 │   │   │   │   ├── search.ts
+│   │   │   │   ├── snippet.ts
 │   │   │   │   ├── select.ts
 │   │   │   │   ├── deselect.ts
 │   │   │   │   ├── list.ts
-│   │   │   │   └── generate.ts
+│   │   │   │   ├── generate.ts
+│   │   │   │   └── doctor.ts
 │   │   │   └── lib/
 │   │   │       ├── config.ts      # .tool/config.json management
 │   │   │       └── db.ts          # Database client
@@ -162,20 +167,33 @@ You are setting up context snippets for this project's CLAUDE.md/AGENTS.md file.
 
 INSTRUCTIONS:
 1. Explore this project to identify the tech stack (check package.json, config files, etc.)
-2. Use `contextkit search "<query>"` to find relevant snippets (e.g., "typescript", "nextjs", "aws")
-3. Use `contextkit select <id>` to add snippets to this project
-4. Use `contextkit list` to see currently selected snippets
-5. Use `contextkit generate` to output the combined markdown
-6. Update CLAUDE.md and/or AGENTS.md with the generated content
+2. Use `contextkit search "<query>" --json` to find relevant snippets (e.g., "typescript", "nextjs", "aws")
+3. Use `contextkit snippet <id>` to preview a specific snippet's full content
+4. Use `contextkit select <id>` to add snippets to this project
+5. Use `contextkit list` to see currently selected snippets
+6. Use `contextkit generate` to output the combined markdown
+7. Update CLAUDE.md and/or AGENTS.md with the generated content
 
 TIPS:
 - Search for frameworks, languages, deployment targets, and coding conventions
 - Select snippets in order of importance (they will be combined in selection order)
+- Use `contextkit doctor` if you encounter any issues
+
+BOOTSTRAP: Add this section to the top of CLAUDE.md to help future agents:
+
+    # ContextKit
+
+    This project uses ContextKit for context management.
+    - Run `contextkit list` to see active snippets
+    - Run `contextkit search "<topic>" --json` to find additional context
+    - Run `contextkit doctor` to diagnose issues
 ```
 
 #### `contextkit search "<query>"`
 
-Searches snippets by semantic similarity.
+Searches snippets by semantic similarity. Supports `--json` flag for machine-readable output.
+
+**Human-readable output:**
 
 ```
 $ contextkit search "typescript strict mode"
@@ -209,9 +227,91 @@ Found 3 matching snippets:
 Use `contextkit select <id>` to add a snippet to this project.
 ```
 
-#### `contextkit select <id>`
+**JSON output (recommended for AI agents):**
 
-Adds a snippet to the project configuration.
+```
+$ contextkit search "typescript strict mode" --json
+```
+
+```json
+{
+  "query": "typescript strict mode",
+  "count": 3,
+  "results": [
+    {
+      "id": "abc123",
+      "title": "typescript-strict",
+      "tags": ["typescript", "config"],
+      "content": "## TypeScript Configuration\n\nUse strict mode with the following tsconfig settings...",
+      "score": 0.92
+    },
+    {
+      "id": "def456",
+      "title": "typescript-eslint",
+      "tags": ["typescript", "eslint", "linting"],
+      "content": "## ESLint for TypeScript\n\nConfigure ESLint with typescript-eslint plugin...",
+      "score": 0.85
+    },
+    {
+      "id": "ghi789",
+      "title": "type-safety-patterns",
+      "tags": ["typescript", "patterns"],
+      "content": "## Type Safety Patterns\n\nPrefer unknown over any...",
+      "score": 0.78
+    }
+  ]
+}
+```
+
+#### `contextkit snippet <id>`
+
+Fetches a single snippet by ID for detailed preview. Useful when an agent wants to re-read a snippet found earlier.
+
+**Human-readable output:**
+
+```
+$ contextkit snippet abc123
+
+=== typescript-strict (abc123) ===
+Tags: typescript, config
+Created: 2024-01-10T08:00:00Z
+Updated: 2024-01-15T10:30:00Z
+
+---
+## TypeScript Configuration
+
+Use strict mode with the following tsconfig settings:
+
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true
+  }
+}
+---
+```
+
+**JSON output:**
+
+```
+$ contextkit snippet abc123 --json
+```
+
+```json
+{
+  "id": "abc123",
+  "title": "typescript-strict",
+  "tags": ["typescript", "config"],
+  "content": "## TypeScript Configuration\n\nUse strict mode with the following tsconfig settings:\n\n{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noUncheckedIndexedAccess\": true,\n    \"noImplicitReturns\": true\n  }\n}",
+  "createdAt": "2024-01-10T08:00:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
+}
+```
+
+#### `contextkit select <id...>`
+
+Adds one or more snippets to the project configuration. Supports `--json` flag.
 
 ```
 $ contextkit select abc123
@@ -220,9 +320,34 @@ Added "typescript-strict" to project.
 Currently selected: 1 snippet(s)
 ```
 
-#### `contextkit deselect <id>`
+```
+$ contextkit select abc123 def456 ghi789
 
-Removes a snippet from the project configuration.
+Added 3 snippets to project:
+  - typescript-strict (abc123)
+  - typescript-eslint (def456)
+  - type-safety-patterns (ghi789)
+Currently selected: 3 snippet(s)
+```
+
+```
+$ contextkit select abc123 def456 --json
+```
+
+```json
+{
+  "action": "added",
+  "snippets": [
+    { "id": "abc123", "title": "typescript-strict" },
+    { "id": "def456", "title": "typescript-eslint" }
+  ],
+  "totalSelected": 2
+}
+```
+
+#### `contextkit deselect <id...>`
+
+Removes one or more snippets from the project configuration. Supports `--json` flag.
 
 ```
 $ contextkit deselect abc123
@@ -231,9 +356,34 @@ Removed "typescript-strict" from project.
 Currently selected: 0 snippet(s)
 ```
 
+```
+$ contextkit deselect abc123 def456 ghi789
+
+Removed 3 snippets from project:
+  - typescript-strict (abc123)
+  - typescript-eslint (def456)
+  - type-safety-patterns (ghi789)
+Currently selected: 0 snippet(s)
+```
+
+```
+$ contextkit deselect abc123 def456 --json
+```
+
+```json
+{
+  "action": "removed",
+  "snippets": [
+    { "id": "abc123", "title": "typescript-strict" },
+    { "id": "def456", "title": "typescript-eslint" }
+  ],
+  "totalSelected": 0
+}
+```
+
 #### `contextkit list`
 
-Shows currently selected snippets.
+Shows currently selected snippets. Supports `--json` flag.
 
 ```
 $ contextkit list
@@ -250,9 +400,35 @@ Use `contextkit deselect <id>` to remove a snippet.
 Use `contextkit generate` to output combined markdown.
 ```
 
+```
+$ contextkit list --json
+```
+
+```json
+{
+  "projectPath": "/Users/will/projects/my-app",
+  "configPath": ".contextkit/config.json",
+  "count": 2,
+  "snippets": [
+    {
+      "id": "abc123",
+      "title": "typescript-strict",
+      "tags": ["typescript", "config"],
+      "selectedAt": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": "xyz789",
+      "title": "nextjs-app-router",
+      "tags": ["nextjs", "react", "routing"],
+      "selectedAt": "2024-01-15T10:31:00Z"
+    }
+  ]
+}
+```
+
 #### `contextkit generate`
 
-Outputs the combined markdown content.
+Outputs the combined markdown content. Supports `--json` flag.
 
 ```
 $ contextkit generate
@@ -275,6 +451,101 @@ When working with the App Router...
 === END GENERATED CONTENT ===
 
 Copy the above content into your CLAUDE.md and/or AGENTS.md file.
+```
+
+```
+$ contextkit generate --json
+```
+
+```json
+{
+  "snippetIds": ["abc123", "xyz789"],
+  "snippetTitles": ["typescript-strict", "nextjs-app-router"],
+  "content": "<!-- Managed by ContextKit - Do not edit this section manually -->\n<!-- Snippets: typescript-strict, nextjs-app-router -->\n\n## TypeScript Configuration\n\nUse strict mode with the following tsconfig settings...\n\n## Next.js App Router\n\nWhen working with the App Router...\n\n<!-- End Managed Section -->"
+}
+```
+
+#### `contextkit doctor`
+
+Runs diagnostics to verify ContextKit is working properly. Useful for debugging. Supports `--json` flag.
+
+```
+$ contextkit doctor
+
+=== CONTEXTKIT DIAGNOSTICS ===
+
+[✓] Database
+    Location: ~/.local/share/contextkit/contextkit.db
+    Status: Connected
+    Snippets: 42
+
+[✓] Embeddings
+    Model: all-MiniLM-L6-v2
+    Status: Loaded
+    Test query: OK (responded in 120ms)
+
+[✓] Project Config
+    Path: /Users/will/projects/my-app/.contextkit/config.json
+    Status: Valid
+    Selected snippets: 2
+    All snippet IDs exist: Yes
+
+=== ALL CHECKS PASSED ===
+```
+
+**Example with issues:**
+
+```
+$ contextkit doctor
+
+=== CONTEXTKIT DIAGNOSTICS ===
+
+[✓] Database
+    Location: ~/.local/share/contextkit/contextkit.db
+    Status: Connected
+    Snippets: 42
+
+[✓] Embeddings
+    Model: all-MiniLM-L6-v2
+    Status: Loaded
+    Test query: OK (responded in 120ms)
+
+[✗] Project Config
+    Path: /Users/will/projects/my-app/.contextkit/config.json
+    Status: Invalid
+    Error: Snippet "old-snippet-id" not found in database
+
+=== 1 CHECK FAILED ===
+
+Run `contextkit deselect old-snippet-id` to fix, or delete .contextkit/config.json to reset.
+```
+
+```
+$ contextkit doctor --json
+```
+
+```json
+{
+  "status": "healthy",
+  "checks": {
+    "database": {
+      "ok": true,
+      "location": "~/.local/share/contextkit/contextkit.db",
+      "snippetCount": 42
+    },
+    "embeddings": {
+      "ok": true,
+      "model": "all-MiniLM-L6-v2",
+      "latencyMs": 120
+    },
+    "projectConfig": {
+      "ok": true,
+      "path": "/Users/will/projects/my-app/.contextkit/config.json",
+      "selectedCount": 2,
+      "missingSnippets": []
+    }
+  }
+}
 ```
 
 ### Project Config File
