@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { program, output, isJsonOutput, printBlock } from '../index';
-import { getDb, getDbPath, preloadModel } from '@contextkit/shared';
+import { getDbPath, preloadModel } from '@contextkit/shared';
+import { getDb } from '../lib/db';
 import { loadConfig, hasConfigDir } from '../lib/config';
 import fs from 'fs';
 

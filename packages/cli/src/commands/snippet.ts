@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { program, output, outputError, isJsonOutput, printBlock } from '../index';
-import { getDb, getSnippet } from '@contextkit/shared';
+import { getSnippet } from '@contextkit/shared';
+import { getDb } from '../lib/db';
 
 program
   .command('snippet <id>')

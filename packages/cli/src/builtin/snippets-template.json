@@ -1,0 +1,38 @@
+[
+  {
+    "id": "builtin-nextjs",
+    "title": "Next.js App Router Best Practices",
+    "tags": ["builtin", "nextjs", "react", "web"],
+    "content": "# Next.js App Router\n\n## File Structure\n- `app/` - App Router pages and layouts\n- `app/layout.tsx` - Root layout (required)\n- `app/page.tsx` - Home page\n- `app/[slug]/page.tsx` - Dynamic routes\n- `app/api/` - API routes (Route Handlers)\n\n## Server vs Client Components\n- Default: Server Components (no 'use client')\n- Add 'use client' only when needed (hooks, browser APIs, event handlers)\n- Keep client components small, push state down\n\n## Data Fetching\n- Fetch in Server Components directly (no useEffect)\n- Use `fetch()` with automatic deduplication\n- Parallel fetching: `Promise.all([fetch1(), fetch2()])`\n\n## Caching\n- `fetch()` cached by default\n- Revalidate: `{ next: { revalidate: 3600 } }`\n- No cache: `{ cache: 'no-store' }`\n\n## Loading & Error States\n- `loading.tsx` - Suspense boundary\n- `error.tsx` - Error boundary ('use client' required)\n- `not-found.tsx` - 404 page\n\n## Metadata\n```typescript\nexport const metadata: Metadata = {\n  title: 'Page Title',\n  description: 'Page description'\n};\n```\n\n## Server Actions\n- 'use server' directive\n- Form submissions without API routes\n- Progressive enhancement"
+  },
+  {
+    "id": "builtin-python",
+    "title": "Python Project Conventions",
+    "tags": ["builtin", "python"],
+    "content": "# Python Project Conventions\n\n## Project Structure\n```\nproject/\n  src/project_name/\n    __init__.py\n    main.py\n  tests/\n    __init__.py\n    test_main.py\n  pyproject.toml\n  README.md\n```\n\n## pyproject.toml (Modern Standard)\n```toml\n[project]\nname = \"project-name\"\nversion = \"0.1.0\"\nrequires-python = \">=3.11\"\ndependencies = []\n\n[project.optional-dependencies]\ndev = [\"pytest\", \"ruff\", \"mypy\"]\n```\n\n## Virtual Environments\n```bash\npython -m venv .venv\nsource .venv/bin/activate  # Unix\n.venv\\Scripts\\activate     # Windows\npip install -e \".[dev]\"\n```\n\n## Code Style\n- Use ruff for linting and formatting\n- Type hints on all public functions\n- Docstrings: Google or NumPy style\n\n## Testing\n```bash\npytest tests/ -v\npytest --cov=src  # with coverage\n```\n\n## Common Patterns\n- Entry point: `if __name__ == \"__main__\":`\n- Logging over print: `import logging`\n- Context managers for resources\n- dataclasses or Pydantic for data structures"
+  },
+  {
+    "id": "builtin-typescript",
+    "title": "TypeScript Project Setup",
+    "tags": ["builtin", "typescript", "javascript"],
+    "content": "# TypeScript Project Setup\n\n## tsconfig.json (Strict)\n```json\n{\n  \"compilerOptions\": {\n    \"target\": \"ES2022\",\n    \"module\": \"NodeNext\",\n    \"moduleResolution\": \"NodeNext\",\n    \"strict\": true,\n    \"esModuleInterop\": true,\n    \"skipLibCheck\": true,\n    \"outDir\": \"dist\",\n    \"rootDir\": \"src\"\n  },\n  \"include\": [\"src/**/*\"],\n  \"exclude\": [\"node_modules\", \"dist\"]\n}\n```\n\n## Project Structure\n```\nproject/\n  src/\n    index.ts\n    types.ts\n  dist/           # compiled output\n  package.json\n  tsconfig.json\n```\n\n## package.json Scripts\n```json\n{\n  \"type\": \"module\",\n  \"scripts\": {\n    \"build\": \"tsc\",\n    \"dev\": \"tsc --watch\",\n    \"start\": \"node dist/index.js\"\n  }\n}\n```\n\n## Type Patterns\n- Prefer `interface` for objects, `type` for unions/primitives\n- Use `unknown` over `any`\n- Narrow types with type guards\n- Export types from dedicated `types.ts`\n\n## Best Practices\n- Enable strict mode always\n- Use `const` assertions for literals\n- Avoid `enum`, use const objects\n- Prefer `readonly` for immutable data"
+  },
+  {
+    "id": "builtin-beads",
+    "title": "Beads Issue Tracking Workflow",
+    "tags": ["builtin", "beads", "workflow", "issue-tracking"],
+    "content": "# Beads Issue Tracking\n\nUse `bd` (beads) for issue tracking during development.\n\n## Core Commands\n```bash\nbd ready              # Show issues ready to work (no blockers)\nbd list --status=open # All open issues\nbd show <id>          # Detailed issue view\nbd create --title=\"...\" --type=task|bug|feature --priority=2\nbd update <id> --status=in_progress  # Claim work\nbd close <id>         # Mark complete\nbd sync               # Sync with git remote\n```\n\n## Priority Scale\n- P0: Critical (drop everything)\n- P1: High (do soon)\n- P2: Medium (normal)\n- P3: Low (when time permits)\n- P4: Backlog\n\n## Dependencies\n```bash\nbd dep add <issue> <depends-on>  # issue depends on depends-on\nbd blocked                        # Show blocked issues\n```\n\n## Best Practices\n- Treat issue descriptions like GitHub issues\n- Include file paths, line numbers, code snippets\n- Reference plan files when applicable\n- File discovered issues as you work (don't forget them)\n- Run `bd sync` at session end to push changes\n\n## Workflow\n```bash\nbd ready                          # Find work\nbd update <id> --status=in_progress\n# ... do the work ...\nbd close <id>\nbd sync                           # Push to remote\n```"
+  },
+  {
+    "id": "builtin-claude-plan-mode",
+    "title": "Claude Plan Mode Instructions",
+    "tags": ["builtin", "claude", "planning", "workflow"],
+    "content": "# Claude Plan Mode\n\nInstructions for Claude Code when in plan mode.\n\n## Plan Requirements\nEvery plan should include:\n1. **High Level Requirements** - Must-haves from user, not trivial details\n2. **Architecture Decisions** - Key technical choices\n3. **Data Models** - Relevant schemas/types\n4. **Testing Strategy** - TDD approach: test scripts, unit tests, integration tests\n\n## Plan Structure\n- First line: document work in beads (`bd` commands)\n- Split work into epics, issues, handle dependencies\n- Each issue description references plan filepath\n\n## At End of Plan\nProvide list of unresolved questions (if any):\n- Extremely concise\n- Sacrifice grammar for brevity\n\n## Example Questions\n```\n- Auth: JWT or session cookies?\n- DB: Postgres or SQLite?\n- Cache layer needed?\n```\n\n## Key Principles\n- Plans enable TDD iteration\n- Test scripts validate APIs before web implementation\n- Issues should be self-contained for any developer to pick up"
+  },
+  {
+    "id": "builtin-land-the-plane",
+    "title": "Land The Plane - Session Completion Protocol",
+    "tags": ["builtin", "claude", "workflow", "git"],
+    "content": "# Land The Plane\n\nSession completion protocol. Plane is NOT landed until `git push` succeeds.\n\n## Mandatory Workflow\n\n1. **File remaining work** - Create beads issues for follow-up\n2. **Quality gates** (if code changed) - Tests, linters, builds\n3. **Update issues** - Close finished work\n4. **PUSH TO REMOTE** (mandatory):\n```bash\ngit pull --rebase\n# If conflicts in .beads/issues.jsonl:\n#   git checkout --theirs .beads/issues.jsonl\n#   bd import -i .beads/issues.jsonl\nbd sync\ngit push          # MANDATORY\ngit status        # Must show \"up to date with origin\"\n```\n5. **Clean up git state**:\n```bash\ngit stash clear\ngit remote prune origin\n```\n6. **Verify** - All changes committed AND pushed\n7. **Hand off** - Provide next session prompt\n\n## Critical Rules\n- NEVER stop before `git push`\n- NEVER say \"ready to push when you are\" - YOU push\n- If push fails, resolve and retry until success\n- Unpushed work breaks multi-agent coordination\n\n## Session Summary Format\n- What was completed\n- Issues filed for follow-up\n- Quality gates status\n- Confirmation all changes pushed\n- Recommended prompt for next session"
+  }
+]

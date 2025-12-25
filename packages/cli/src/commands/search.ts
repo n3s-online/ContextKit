@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { program, output, outputError, isJsonOutput, displayId, printBlock } from '../index';
-import { getDb, searchSnippets } from '@contextkit/shared';
+import { searchSnippets } from '@contextkit/shared';
+import { getDb } from '../lib/db';
 
 program
   .command('search <query>')

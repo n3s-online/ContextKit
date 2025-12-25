@@ -34,7 +34,8 @@ export function upsertEmbedding(
       'SELECT rowid FROM snippet_embedding_map WHERE snippet_id = ?'
     ).get(snippetId) as { rowid: number } | undefined;
 
-    const vecBuffer = new Float32Array(embedding).buffer;
+    const float32 = new Float32Array(embedding);
+    const vecBuffer = Buffer.from(float32.buffer);
 
     if (existing) {
       db.prepare(
@@ -63,7 +64,8 @@ export function searchSimilar(
   queryEmbedding: number[],
   limit: number = 10
 ): Array<{ snippetId: string; distance: number }> {
-  const vecBuffer = new Float32Array(queryEmbedding).buffer;
+  const float32 = new Float32Array(queryEmbedding);
+  const vecBuffer = Buffer.from(float32.buffer);
 
   const results = db.prepare(`
     SELECT
@@ -72,8 +74,8 @@ export function searchSimilar(
     FROM snippet_embeddings e
     JOIN snippet_embedding_map m ON m.rowid = e.rowid
     WHERE e.embedding MATCH ?
+      AND e.k = ?
     ORDER BY e.distance
-    LIMIT ?
   `).all(vecBuffer, limit) as Array<{
     snippet_id: string;
     distance: number;

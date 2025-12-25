@@ -1,7 +1,8 @@
 import { Command } from 'commander';
 import { program, output, outputError, isJsonOutput, displayId, printBlock } from '../index';
-import { getDb, getSnippetsByIds } from '@contextkit/shared';
+import { getSnippetsByIds } from '@contextkit/shared';
 import type { SelectedSnippet } from '@contextkit/shared';
+import { getDb } from '../lib/db';
 import { loadOrCreateConfig, addSelectedSnippets } from '../lib/config';
 
 program

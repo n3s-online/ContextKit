@@ -4,5 +4,6 @@ export * from './db/schema';
 export * from './db/rows';
 export * from './db/repository';
 export * from './db/vectors';
+export * from './db/seed';
 export * from './embeddings';
 export * from './search';
