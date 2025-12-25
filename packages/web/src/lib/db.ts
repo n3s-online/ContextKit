@@ -1,24 +1,11 @@
-import {
-  getDb,
-  initSchema,
-  isSchemaInitialized,
-} from '@contextkit/shared';
-
-let initialized = false;
+import { getDb } from '@contextkit/shared';
 
 /**
- * Get database connection, initializing schema once on first call.
- * Schema init happens once per process, not per request.
+ * Get database connection.
+ * Schema is automatically initialized by getDb().
  */
 export function db() {
-  const conn = getDb();
-  if (!initialized) {
-    if (!isSchemaInitialized(conn)) {
-      initSchema(conn);
-    }
-    initialized = true;
-  }
-  return conn;
+  return getDb();
 }
 
 // UUID v4 regex

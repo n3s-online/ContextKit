@@ -2,6 +2,8 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
+import { initSchema } from './schema';
+import { loadVecExtension, initVectorTable } from './vectors';
 
 /**
  * Get the platform-specific database directory
@@ -28,13 +30,16 @@ export function getDbPath(): string {
 let db: Database.Database | null = null;
 
 /**
- * Get or create the database connection
+ * Get or create the database connection (with schema initialized)
  */
 export function getDb(): Database.Database {
   if (!db) {
     const dbPath = getDbPath();
     db = new Database(dbPath);
     db.pragma('journal_mode = WAL');
+    loadVecExtension(db);
+    initSchema(db);
+    initVectorTable(db);
   }
   return db;
 }
@@ -50,15 +55,18 @@ export function closeDb(): void {
 }
 
 /**
- * For testing: create in-memory database
+ * For testing: create in-memory database (with schema)
  */
 export function getTestDb(): Database.Database {
-  return new Database(':memory:');
+  const testDb = new Database(':memory:');
+  loadVecExtension(testDb);
+  initSchema(testDb);
+  initVectorTable(testDb);
+  return testDb;
 }
 
 /**
  * For testing: reset the singleton connection
- * Allows tests to start with a fresh DB
  */
 export function resetDb(): void {
   closeDb();
@@ -66,7 +74,6 @@ export function resetDb(): void {
 
 /**
  * For testing: set a custom database instance
- * Useful for injecting test databases
  */
 export function setDb(database: Database.Database): void {
   if (db) {
