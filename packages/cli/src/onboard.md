@@ -1,59 +1,30 @@
-# ContextKit - AI Agent Integration Guide
+# ContextKit
 
-## Overview
+Your goal: Configure this project's CLAUDE.md/AGENTS.md with relevant context snippets.
 
-ContextKit manages reusable code snippets that AI agents can search and include in their context. Snippets are stored in a local SQLite database with vector embeddings for semantic search.
+## Workflow
 
-## Quick Start
-
-1. Search for relevant snippets:
-   contextkit search "authentication flow"
-
-2. Select useful ones:
-   contextkit select <snippet-id>
-
-3. Generate markdown context:
-   contextkit generate
+1. **Explore the project** - Check package.json, config files, etc. to identify the tech stack
+2. **Search for snippets** - `contextkit search "nextjs" --json`
+3. **Preview if needed** - `contextkit snippet <id>` to see full content
+4. **Select relevant ones** - `contextkit select <id> <id> ...`
+5. **Generate output** - `contextkit generate`
+6. **Update context file** - Add the generated content to CLAUDE.md or AGENTS.md
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| search <query> | Semantic search for snippets |
-| snippet <id> | View a single snippet |
-| select <id...> | Add snippets to selection |
-| deselect <id...> | Remove from selection |
-| list | Show selected snippets |
-| generate | Output combined markdown |
-| doctor | Check system health |
-| onboard | Show this guide |
-
-## CLAUDE.md Integration
-
-Add this to your project's CLAUDE.md:
-
-```markdown
-## ContextKit Integration
-
-This project uses ContextKit for reusable code patterns.
-
-**Workflow:**
-1. Search: `contextkit search "your query"`
-2. Select: `contextkit select <id>`
-3. Generate: `contextkit generate`
-
-When implementing features, search for relevant snippets first.
-```
+| `search <query>` | Find snippets by topic (use `--json` for structured output) |
+| `snippet <id>` | View a single snippet's full content |
+| `select <id...>` | Add snippets to this project |
+| `deselect <id...>` | Remove snippets from this project |
+| `list` | Show currently selected snippets |
+| `generate` | Output combined markdown for all selected snippets |
+| `doctor` | Diagnose issues |
 
 ## Tips
 
-- Use --json flag for machine-readable output
-- Run `contextkit doctor` to verify installation
-- Snippets persist across sessions in ~/.local/share/contextkit/
-
-## Troubleshooting
-
-If commands fail, run:
-  contextkit doctor
-
-This checks database, embeddings model, and config status.
+- Search for frameworks, languages, conventions, and tools you see in the project
+- Select snippets in priority order (they combine in selection order)
+- Use `--json` flag for machine-readable output
