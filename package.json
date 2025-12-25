@@ -9,5 +9,9 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test"
   },
-  "packageManager": "pnpm@9.15.1"
+  "packageManager": "pnpm@9.15.1",
+  "dependencies": {
+    "sqlite-vec": "0.1.7-alpha.2",
+    "sqlite-vec-darwin-arm64": "0.1.7-alpha.2"
+  }
 }
