@@ -6,7 +6,7 @@
   },
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && cp src/onboard.md dist/commands/ && cp -r src/builtin dist/",
+    "build": "tsc && cp -r src/builtin dist/",
     "dev": "tsc --watch",
     "start": "node dist/index.js"
   },
