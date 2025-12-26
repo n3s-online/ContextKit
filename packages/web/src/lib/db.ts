@@ -18,6 +18,12 @@ export function isValidUUID(id: string): boolean {
   return UUID_REGEX.test(id);
 }
 
+const BUILTIN_PREFIX = 'builtin-';
+
+export function isValidSnippetId(id: string): boolean {
+  return isValidUUID(id) || id.startsWith(BUILTIN_PREFIX);
+}
+
 /**
  * Validate tags array - must be array of non-empty strings
  */

@@ -6,7 +6,7 @@ import {
   getSnippetVersions,
   type UpdateSnippetInput,
 } from '@contextkit/shared';
-import { db, isValidUUID, validateTags } from '@/lib/db';
+import { db, isValidSnippetId, validateTags } from '@/lib/db';
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -19,7 +19,7 @@ export async function GET(_: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
 
-    if (!isValidUUID(id)) {
+    if (!isValidSnippetId(id)) {
       return NextResponse.json(
         { error: 'Invalid snippet ID format' },
         { status: 400 }
@@ -53,7 +53,7 @@ export async function PUT(request: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
 
-    if (!isValidUUID(id)) {
+    if (!isValidSnippetId(id)) {
       return NextResponse.json(
         { error: 'Invalid snippet ID format' },
         { status: 400 }
@@ -145,7 +145,7 @@ export async function DELETE(_: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
 
-    if (!isValidUUID(id)) {
+    if (!isValidSnippetId(id)) {
       return NextResponse.json(
         { error: 'Invalid snippet ID format' },
         { status: 400 }
