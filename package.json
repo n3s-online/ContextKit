@@ -7,11 +7,17 @@
   "scripts": {
     "dev": "pnpm -r dev",
     "build": "pnpm -r build",
-    "test": "pnpm -r test"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "packageManager": "pnpm@9.15.1",
   "dependencies": {
     "sqlite-vec": "0.1.7-alpha.2",
     "sqlite-vec-darwin-arm64": "0.1.7-alpha.2"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.16",
+    "vitest": "^4.0.16"
   }
 }
